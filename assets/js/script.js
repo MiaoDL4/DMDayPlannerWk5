@@ -1,24 +1,29 @@
 //show current date on top
 var currentTime = dayjs();
-$("#currentDay").text(currentTime.format("dddd MMMM DD"))
+var currentHour = dayjs().hour()
+$("#currentDay").text(currentTime.format("MMMM DD,YYYY hh:mm A"))
 
-//apended planner
-for(hourMark = 9; hourMark < 18; hourMark ++){ //can use forEach, i would need array
-    var hourRow = $("<div>");
+console.log(currentHour);
+var tweleveHr = ["8.00am", "9.00am", "10.00am", "11.00am", "12.00pm", "1.00pm", "2.00pm", "3.00pm", "4.00pm", "5.00pm"]
+
+//apended planner java script copy of what was in HTML
+for(i = 0; i < tweleveHr.length ; i ++){
+    var hourRow = $("<div>"); //parent div
     hourRow.addClass("row time-block");
-    hourRow.attr("id", hourMark);
-    var hourColumn = $("<div>");
-    hourColumn.addClass("col-2 col-md-1 hour text-center py-3");
-    hourColumn.text(hourMark + ":00");
-    var textColumn = $("<textarea>");
-    textColumn.addClass("col-8 col-md-10 description");
+    hourRow.addClass(tweleveHr[i]);
+    hourRow.attr("id", i + 8); // +8 to make up hour difference
+    var hourColumn = $("<div>"); //child div
+    hourColumn.addClass("col-2 col-md-1 hour text-center py-3");        
+    hourColumn.text(tweleveHr[i]);
+    var textColumn = $("<textarea>");//child div
+    textColumn.addClass("col-8 col-md-10 reminder");
     var saveBtn = $("<button>");
     saveBtn.addClass("btn saveBtn col-2 col-md-1");
     saveBtn.attr("aria-hidden", "save");
-    var iSaveBtn = $("<i>");
+    var iSaveBtn = $("<i>");//child child div
     iSaveBtn.addClass("fas fa-save")
     iSaveBtn.attr("aria-hidden", "true");
-    hourRow.append(hourColumn, textColumn, saveBtn); // parent is hourRow
+    hourRow.append(hourColumn, textColumn, saveBtn);
     saveBtn.append(iSaveBtn);
     $(".container").append(hourRow);
 }
@@ -28,9 +33,25 @@ $('.saveBtn').click(saveNote);
 
 //save in to local storage
 function saveNote () {
-    var time = $(this).parent().attr('id'); //gets the hour (hourmark)
-    var descriptionText = $(this).siblings('.description').val(); //get the text from desciption
-    localStorage.setItem(time, descriptionText);
+    var timeRow = $(this).parent().attr('id'); 
+    var saveRow = $(this).siblings('.reminder').val();
+    localStorage.setItem(timeRow, saveRow);
 }
 
 //changing the color based on time
+$(".time-block").each(function(){
+    var plannerTime = parseInt($(this).attr("id"));
+    if (plannerTime < currentHour) {
+        $(this).addClass("past");
+    } else if (plannerTime > currentHour) {
+        $(this).addClass("future");
+    } else {
+        $(this).addClass("present");
+    }
+})
+
+//display stored data
+for(j = 8; j < 17 ; j ++){
+    $(`#${j}`).children('.reminder').val(localStorage.getItem(j))// remember the tilde key!!!!!
+}
+
